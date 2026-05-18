@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:3000
+
+###
+GET {{baseUrl}}/articles/1
+
+###
+POST {{baseUrl}}/articles
+Content-Type: application/json
+
+{
+  "title": "제목",
+  "content": "내용"
+}

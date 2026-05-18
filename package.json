@@ -1,6 +1,16 @@
 {
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "type": "module",
   "dependencies": {
-    "@prisma/client": "^7.8.0",
-    "prisma": "^7.8.0"
+    "@prisma/client": "^6.19.3",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "nodemon": "^3.1.14",
+    "prisma": "^6.19.3"
   }
 }
