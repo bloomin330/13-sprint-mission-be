@@ -11,3 +11,15 @@ Content-Type: application/json
   "title": "제목",
   "content": "내용"
 }
+
+###
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+    "name": "아이폰 15",
+    "description": "좋은 핸드폰",
+    "price": 1500000,
+    "tags": ["apple", "phone"],
+    "favoriteCount": 0
+}

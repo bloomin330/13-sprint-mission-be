@@ -3,24 +3,27 @@ import prisma from "../../prisma/prisma.js";
 
 const router = express.Router();
 
-// 게시글 생성 API
+// 상품 생성 API
 router.post("/", async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { name, description, price, tags, favoriteCount } = req.body;
 
-    if (!title || !content) {
+    if (!name || !description || !price || !tags) {
       return res.status(404).json({
-        message: "title, content가 필요합니다.",
+        message: "name, description, price, tags는 필수입니다.",
       });
     }
 
-    const article = await prisma.article.create({
+    const product = await prisma.product.create({
       data: {
-        title,
-        content,
+        name,
+        description,
+        price,
+        tags,
+        favoriteCount: favoriteCount ?? 0,
       },
     });
-    res.status(201).json(article);
+    res.status(201).json(product);
   } catch (error) {
     res.status(500).json({
       message: "서버 오류",
@@ -28,12 +31,12 @@ router.post("/", async (req, res) => {
   }
 });
 
-// 게시글 상세 조회 API
+// 상품 상세 조회 API
 router.get("/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    const article = await prisma.article.findUnique({
+    const product = await prisma.product.findUnique({
       where: { id },
 
       select: {
@@ -44,12 +47,12 @@ router.get("/:id", async (req, res) => {
       },
     });
 
-    if (!article) {
+    if (!product) {
       return res.status(404).json({
         message: "찾을 수 없습니다.",
       });
     }
-    res.status(200).json(article);
+    res.status(200).json(product);
   } catch (err) {
     res.status(500).json({
       message: "서버 오류",
@@ -57,23 +60,23 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// 게시글 수정 API
+// 상품 수정 API
 router.patch("/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
 
     const { title, content } = req.body;
 
-    const article = await prisma.article.findUnique({
+    const product = await prisma.product.findUnique({
       where: { id },
     });
 
-    if (!article) {
+    if (!product) {
       return res.status(404).json({
         message: "찾을 수 없습니다.",
       });
     }
-    const updatedArticle = await prisma.article.update({
+    const updatedProduct = await prisma.product.update({
       where: { id },
 
       data: {
@@ -82,7 +85,7 @@ router.patch("/:id", async (req, res) => {
       },
     });
 
-    res.status(200).json(updatedArticle);
+    res.status(200).json(updatedProduct);
   } catch (err) {
     res.status(500).json({
       message: "서버 오류",
@@ -90,22 +93,22 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-// 게시글 삭제 API
+// 상품 삭제 API
 router.delete("/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    const article = await prisma.article.findUnique({
+    const product = await prisma.product.findUnique({
       where: { id },
     });
 
-    if (!article) {
+    if (!product) {
       return res.status(404).json({
         message: "찾을 수 없습니다.",
       });
     }
 
-    await prisma.article.delete({
+    await prisma.product.delete({
       where: { id },
     });
 
