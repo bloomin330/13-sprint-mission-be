@@ -41,9 +41,13 @@ router.get("/:id", async (req, res) => {
 
       select: {
         id: true,
-        title: true,
-        content: true,
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        favoriteCount: true,
         createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -65,7 +69,7 @@ router.patch("/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    const { title, content } = req.body;
+    const { name, description, price, tags, favoriteCount } = req.body;
 
     const product = await prisma.product.findUnique({
       where: { id },
@@ -80,8 +84,11 @@ router.patch("/:id", async (req, res) => {
       where: { id },
 
       data: {
-        title,
-        content,
+        name,
+        description,
+        price,
+        tags,
+        favoriteCount,
       },
     });
 
@@ -120,12 +127,69 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// 게시글 목록 조회 API
+// 상품 목록 조회 API
+router.get("/", async (req, res) => {
+  try {
+    let { page, limit, sort, keyword } = req.query;
 
-// router.get("/", async (req,res) => {
-//     try{
-//         let{ page, limit, keyword, sort} = req.query;
-//     }
-// })
+    page = Number(page) || 1;
+    limit = Number(limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    const where = keyword
+      ? {
+          OR: [
+            {
+              name: {
+                contains: keyword,
+                mode: "insensitive",
+              },
+            },
+            {
+              description: {
+                contains: keyword,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }
+      : {};
+
+    const orderBy =
+      sort === "old" ? { createdAt: "asc" } : { createdAt: "desc" };
+
+    const products = await prisma.product.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        favoriteCount: true,
+        createdAt: true,
+      },
+    });
+
+    const total = await prisma.product.count({
+      where,
+    });
+
+    res.status(200).json({
+      data: products,
+      page,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "SERVER ERROR",
+    });
+  }
+});
 
 export default router;

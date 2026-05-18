@@ -118,11 +118,63 @@ router.delete("/:id", async (req, res) => {
 });
 
 // 게시글 목록 조회 API
+router.get("/", async (req, res) => {
+  try {
+    let { page, limit, sort, keyword } = req.query;
 
-// router.get("/", async (req,res) => {
-//     try{
-//         let{ page, limit, keyword, sort} = req.query;
-//     }
-// })
+    page = Number(page) || 1;
+    limit = Number(limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    const where = keyword
+      ? {
+          OR: [
+            {
+              title: {
+                contains: keyword,
+                mode: "insensitive",
+              },
+            },
+            {
+              content: {
+                contains: keyword,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }
+      : {};
+
+    const orderBy =
+      sort === "old" ? { createdAt: "asc" } : { createdAt: "desc" }; // 기본 = 최신순(recent)
+
+    const articles = await prisma.article.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+      },
+    });
+
+    const total = await prisma.article.count({ where });
+
+    res.status(200).json({
+      data: articles,
+      page,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "SERVER ERROR",
+    });
+  }
+});
 
 export default router;

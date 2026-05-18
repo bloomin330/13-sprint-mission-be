@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:3000
 
 ###
-GET {{baseUrl}}/articles/1
+GET {{baseUrl}}/articles/
 
 ###
 POST {{baseUrl}}/articles
