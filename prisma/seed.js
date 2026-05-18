@@ -8,40 +8,61 @@ async function main() {
   await prisma.article.deleteMany();
   await prisma.comment.deleteMany();
   console.log("기존 데이터 삭제 완료");
-
-  // 사용자 생성
-  const products = await prisma.user.createMany({
-    data: [{ name: "Alice" }, { name: "Bob" }],
+  const article1 = await prisma.article.create({
+    data: {
+      title: "첫 번째 게시글",
+      content: "안녕하세요 자유게시판입니다.",
+    },
   });
 
-  console.log(`${users.count}명 사용자 생성`);
+  const article2 = await prisma.article.create({
+    data: {
+      title: "두 번째 게시글",
+      content: "Prisma 너무 재밌다",
+    },
+  });
 
-  // Todo 생성
-  const todos = await prisma.todo.createMany({
+  const product1 = await prisma.product.create({
+    data: {
+      name: "노트북",
+      description: "게이밍 노트북",
+      price: 1500000,
+      tags: ["electronics", "laptop"],
+      favoriteCount: 0,
+    },
+  });
+
+  const product2 = await prisma.product.create({
+    data: {
+      name: "키보드",
+      description: "기계식 키보드",
+      price: 120000,
+      tags: ["keyboard", "mechanical"],
+      favoriteCount: 3,
+    },
+  });
+
+  await prisma.comment.createMany({
     data: [
       {
-        title: "우유 사오기",
-        content: "저지방 1L",
-        isDone: false,
+        content: "첫 댓글입니다!",
+        articleId: article1.id,
       },
       {
-        title: "Prisma 공부하기",
-        content: "[3] 챕터까지 끝내기",
-        isDone: false,
+        content: "좋은 글이네요",
+        articleId: article1.id,
       },
       {
-        title: "운동하기",
-        content: "30분 조깅",
-        isDone: true,
+        content: "이 제품 좋아요",
+        productId: product1.id,
       },
       {
-        title: "이메일 확인",
-        isDone: true,
+        content: "가격 괜찮네요",
+        productId: product2.id,
       },
     ],
   });
-
-  console.log(`${todos.count}개 Todo 생성`);
+  console.log("seed 파일 생성");
 }
 
 main()
